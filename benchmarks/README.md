@@ -33,21 +33,7 @@ $ cmake -G Ninja ../llvm \
 $ ninja
 ```
 
-### **3. build SLEEF**
-
-SLEEF is a dependency of triton-cpu. Although documentation of triton-cpu does not mention the need for manual building, this step is essential to avoid runtime issues.
-
-```sh
-$ cd benchmarks/
-$ cd ./triton-cpu # cloned as a submodule. Since triton-cpu is under development, this is a forked repo
-$ git submodule update --init # clone SLEEF as submodule of triton-cpu
-$ cd third_party/sleef
-$ mkdir build # provided in the SLEEF README for building the project.
-$ cmake -S . -B build
-$ cmake --build build -j --clean-first
-```
-
-### **4. Edit and Build triton-cpu**
+### **3. Edit and Build triton-cpu**
 
 ```sh
 $ cd benchmarks
@@ -73,6 +59,7 @@ $ ./build.sh  # Customize sections marked with "Make your changes here if you ne
 $ ./run.sh
 $ ./report.sh
 ```
+Check the `performance_report_overall.csv` generated under `benchmarks` directory.
 
 ## Cross-compiling for RISC-V
 
@@ -97,14 +84,14 @@ $ git clone git@github.com:llvm/llvm-project.git
 $ mkdir llvm-project/build
 $ cd llvm-project/build
 $ git checkout 86b69c3 # Ensure it matches the version used by triton-cpu
-$ cmake -G Ninja ../llvm-project \
+$ cmake -G Ninja ../llvm \
     -DLLVM_ENABLE_PROJECTS="mlir;clang;openmp" \
-    -DLLVM_TARGETS_TO_BUILD="host;riscv" \
+    -DLLVM_TARGETS_TO_BUILD="host;RISCV" \
     -DOPENMP_ENABLE_LIBOMPTARGET=OFF \
     -DLLVM_ENABLE_ASSERTIONS=ON \
     -DCMAKE_BUILD_TYPE=RELEASE
 $ ninja check-mlir check-clang
-$ export CLANG_BUILD_DIR=<path-to-this-llvm-project>/build
+$ export CLANG_BUILD_DIR=<path-to-this-llvm-project>/build # For examples, export CLANG_BUILD_DIR=./llvm-project/build-86b69c-rv
 ```
 
 ### **3. Running on a RISC-V Platform**
@@ -113,7 +100,7 @@ First, use `build.sh` to cross-compile and generate ELF files locally. Then, tra
 
 ```sh
 $ cd benchmarks
-$ ./build.sh rv
+$ ./build.sh --platform rv
 $ ./copy_to_remote.sh # Modify REMOTE IP and file paths accordingly.
 $ <Use SSH to connect to the REMOTE IP>
 
@@ -127,3 +114,4 @@ $ <Use SSH to connect to the REMOTE IP>
 $ ./copy_remote_back.sh # Modify REMOTE IP and file paths accordingly.
 $ ./report.sh
 ```
+Check the `performance_report_overall.csv` generated under `benchmarks` directory.
